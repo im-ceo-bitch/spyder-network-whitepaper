@@ -1,1 +1,147 @@
+name: Auto Unpack ZIP Updates
 
+on:
+  push:
+    paths:
+      - '*.zip'
+      - 'updates/*.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: zip-unpack-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unpack:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate and unpack uploaded ZIP files
+        id: extract
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          import shutil
+          import stat
+          import subprocess
+          import sys
+          import tempfile
+          import zipfile
+          from pathlib import Path, PurePosixPath
+
+          repo = Path.cwd()
+          upload_dir = repo / 'updates'
+          archives = sorted(repo.glob('*.zip'))
+          if upload_dir.exists():
+              archives += sorted(upload_dir.glob('*.zip'))
+          print(f'ZIP files found: {len(archives)}', flush=True)
+          if not archives:
+              sys.exit(0)
+
+          MAX_FILES = 5000
+          MAX_TOTAL_BYTES = 500 * 1024 * 1024
+          ignored_dirs = {'__MACOSX', '__pycache__', 'node_modules', '.pytest_cache'}
+          ignored_files = {'.DS_Store', 'Thumbs.db', 'desktop.ini'}
+          processed_files = 0
+          total_bytes = 0
+          status = 0
+          temp_root = Path(os.environ.get('RUNNER_TEMP') or tempfile.gettempdir())
+
+          try:
+              with tempfile.TemporaryDirectory(prefix='zip-import-', dir=temp_root) as tmp:
+                  stage = Path(tmp)
+                  for archive in archives:
+                      print(f'Checking {archive.relative_to(repo)}', flush=True)
+                      with zipfile.ZipFile(archive) as zf:
+                          entries = []
+                          for member in zf.infolist():
+                              raw = member.filename
+                              if (not raw or raw.startswith('/') or '\\' in raw
+                                      or ':' in raw.split('/')[0]):
+                                  raise ValueError(f'Unsafe archive path: {raw!r}')
+                              parts = PurePosixPath(raw).parts
+                              if '..' in parts:
+                                  raise ValueError(f'Path traversal blocked: {raw!r}')
+                              if stat.S_ISLNK(member.external_attr >> 16):
+                                  raise ValueError(f'Symlink blocked: {raw!r}')
+                              if member.is_dir() or not parts:
+                                  continue
+                              if any(part in ignored_dirs for part in parts):
+                                  continue
+                              if any(part in {'.git', '.github', 'updates'} for part in parts):
+                                  print(f'Skipping protected path: {raw}', flush=True)
+                                  continue
+                              if parts[-1] in ignored_files or parts[-1].startswith('._'):
+                                  continue
+                              if member.flag_bits & 0x1:
+                                  raise ValueError(f'Password-protected file: {raw!r}')
+                              if member.file_size > MAX_TOTAL_BYTES:
+                                  raise ValueError(f'File is too large: {raw!r}')
+                              total_bytes += member.file_size
+                              if total_bytes > MAX_TOTAL_BYTES:
+                                  raise ValueError('ZIP contents exceed 500 MB limit')
+                              entries.append((member, parts))
+
+                          if not entries:
+                              raise ValueError(f'No usable files in {archive.name}')
+                          # Drop one wrapper folder, typical of exported GitHub archives.
+                          top = {parts[0] for _, parts in entries}
+                          strip_wrapper = (len(top) == 1 and all(len(parts) > 1 for _, parts in entries))
+                          if strip_wrapper:
+                              print(f'Removing wrapper folder: {next(iter(top))}', flush=True)
+
+                          for member, parts in entries:
+                              target_parts = parts[1:] if strip_wrapper else parts
+                              if not target_parts:
+                                  continue
+                              if any(p in {'.git', '.github', 'updates', '..'} for p in target_parts):
+                                  raise ValueError(f'Unsafe destination: {member.filename!r}')
+                              target = stage.joinpath(*target_parts)
+                              target.parent.mkdir(parents=True, exist_ok=True)
+                              with zf.open(member, 'r') as src, target.open('wb') as dst:
+                                  shutil.copyfileobj(src, dst, length=1024 * 1024)
+                              processed_files += 1
+                              if processed_files > MAX_FILES:
+                                  raise ValueError('Too many files (limit 5000)')
+                  # The repo is not touched until all ZIP files pass validation.
+                  for entry in stage.rglob('*'):
+                      if entry.is_file():
+                          destination = repo / entry.relative_to(stage)
+                          destination.parent.mkdir(parents=True, exist_ok=True)
+                          shutil.copy2(entry, destination)
+                  print(f'Unpacked {processed_files} files successfully.', flush=True)
+          except Exception as exc:
+              status = 1
+              print(f'UNPACK FAILED: {exc}', file=sys.stderr, flush=True)
+              # The runner starts from a clean checkout; revert any partial writes.
+              subprocess.run(['git', 'reset', '--hard', 'HEAD'], cwd=repo, check=True)
+              subprocess.run(['git', 'clean', '-fd'], cwd=repo, check=True)
+              print('Previous repository contents restored.', flush=True)
+          finally:
+              # Always delete ZIPs even after a failed extraction.
+              for archive in archives:
+                  archive.unlink(missing_ok=True)
+                  print(f'Removed ZIP: {archive.relative_to(repo)}', flush=True)
+          sys.exit(status)
+          PY
+
+      - name: Commit extracted files and ZIP cleanup
+        if: ${{ always() && steps.extract.outcome != 'skipped' }}
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: unpack updates and remove uploaded ZIPs [skip ci]"
+          git push
