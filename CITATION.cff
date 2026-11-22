@@ -1,0 +1,56 @@
+cff-version: 1.2.0
+message: "If you use or reference this whitepaper, please cite it using the metadata below."
+title: "Spyder Network — Blockchain Ecosystem Whitepaper v0.2.0"
+authors:
+  - family-names: Kodirov
+    given-names: Aziz
+version: 0.2.0
+date-released: 2026-11-22
+doi: 10.5281/zenodo.24435471
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.24435471
+    description: "Version DOI (v0.2.0)"
+  - type: doi
+    value: 10.5281/zenodo.24435470
+    description: "Concept DOI (all versions, resolves to the latest)"
+  - type: url
+    value: "https://zenodo.org/records/24435471"
+    description: "Zenodo record"
+repository: "https://github.com/im-ceo-bitch/spyder-network-whitepaper"
+url: "https://doi.org/10.5281/zenodo.24435471"
+abstract: >-
+  Spyder Network is an independent blockchain ecosystem currently under
+  research and development. This publication introduces SpyderChain,
+  SpyderCoin (SPD), Spyder Wallet, preliminary tokenomics, network security
+  considerations, and the long-term development roadmap for 2026–2032. All
+  figures and specifications are preliminary. This publication does not
+  announce a token sale, public mainnet launch, investment offering, or
+  guaranteed financial returns.
+keywords:
+  - Spyder Network
+  - SpyderChain
+  - SpyderCoin
+  - SPD
+  - Blockchain
+  - Layer 1
+  - Tokenomics
+  - Cryptocurrency
+  - Proof of Stake
+  - Decentralized Infrastructure
+preferred-citation:
+  type: report
+  title: "Spyder Network — Blockchain Ecosystem Whitepaper v0.2.0"
+  authors:
+    - family-names: Kodirov
+      given-names: Aziz
+  version: 0.2.0
+  year: 2026
+  date-published: 2026-11-22
+  publisher:
+    name: Zenodo
+  doi: 10.5281/zenodo.24435471
+  url: "https://doi.org/10.5281/zenodo.24435471"
+  languages:
+    - ru
+  license: CC-BY-NC-ND-4.0
