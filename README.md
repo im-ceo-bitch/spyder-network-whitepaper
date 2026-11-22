@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24435471.svg)](https://doi.org/10.5281/zenodo.24435471)
+[![Whitepaper licence: CC BY-NC-ND 4.0](https://img.shields.io/badge/Whitepaper%20licence-CC%20BY--NC--ND%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
+
 # SPYDER NETWORK
 
 **Spyder Network · SpyderChain · SpyderCoin (SPD) · Spyder Wallet**
@@ -38,6 +41,41 @@ Please read [SECURITY.md](SECURITY.md), [PUBLICATION_GUIDE_RU.md](PUBLICATION_GU
 
 ## Public record
 
-Document drafting date: **22 November 2026**. Actual public publication date is the GitHub commit and release timestamp after the maintainer uploads these files; the date above is not proof of earlier publication. For a permanent DOI, the maintainer may later archive a GitHub release with Zenodo.
+Document drafting date: **22 November 2026**. Actual public publication date is the GitHub commit and release timestamp after the maintainer uploads these files; the date above is not proof of earlier publication.
+
+The Whitepaper v0.2.0 is permanently archived on Zenodo: [zenodo.org/records/24435471](https://zenodo.org/records/24435471) · DOI [10.5281/zenodo.24435471](https://doi.org/10.5281/zenodo.24435471).
+
+## Citation
+
+If you reference this work, please cite the Zenodo record:
+
+> Kodirov, A. (2026). *Spyder Network — Blockchain Ecosystem Whitepaper v0.2.0* (Version 0.2.0). Zenodo. https://doi.org/10.5281/zenodo.24435471
+
+* Version DOI (v0.2.0): [10.5281/zenodo.24435471](https://doi.org/10.5281/zenodo.24435471)
+* Concept DOI (all versions, always resolves to the latest): [10.5281/zenodo.24435470](https://doi.org/10.5281/zenodo.24435470)
+* Zenodo record: <https://zenodo.org/records/24435471>
+* Machine-readable metadata: [CITATION.cff](CITATION.cff) (used by GitHub's **Cite this repository** button)
+
+```bibtex
+@techreport{kodirov_2026_spyder_whitepaper,
+  author      = {Kodirov, Aziz},
+  title       = {Spyder Network — Blockchain Ecosystem Whitepaper v0.2.0},
+  institution = {Zenodo},
+  year        = {2026},
+  month       = nov,
+  version     = {0.2.0},
+  doi         = {10.5281/zenodo.24435471},
+  url         = {https://doi.org/10.5281/zenodo.24435471}
+}
+```
+
+## License
+
+**Whitepaper only:** the Spyder Network Whitepaper v0.2.0 — [`docs/whitepaper/WHITEPAPER_v0.2.0_RU.md`](docs/whitepaper/WHITEPAPER_v0.2.0_RU.md), [`docs/whitepaper/WHITEPAPER_v0.2.0_RU.pdf`](docs/whitepaper/WHITEPAPER_v0.2.0_RU.pdf) and the copy archived on [Zenodo](https://doi.org/10.5281/zenodo.24435471) — is licensed under [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+* Non-commercial redistribution of the original Whitepaper is permitted with mandatory attribution.
+* Distribution of modified versions and commercial use are not permitted without separate permission from the author.
+
+This licence **does not** automatically extend to the SpyderChain source code, the SPD cryptocurrency or any token, the Spyder Network names or marks, or the other files in this repository. No licence is granted for those materials unless one is stated separately. See [RIGHTS_AND_BRAND.md](RIGHTS_AND_BRAND.md).
 
 **GitHub publication ≠ trademark ownership, currency creation, network launch or legal authorization to offer cryptoassets.**
